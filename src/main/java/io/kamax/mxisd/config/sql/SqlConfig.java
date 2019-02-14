@@ -21,6 +21,7 @@
 package io.kamax.mxisd.config.sql;
 
 import io.kamax.mxisd.util.GsonUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,11 +193,35 @@ public abstract class SqlConfig {
 
     }
 
+    public static class ProfileRoles {
+
+        private String type;
+        private String query;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getQuery() {
+            return query;
+        }
+
+        public void setQuery(String query) {
+            this.query = query;
+        }
+
+    }
+
     public static class Profile {
 
         private Boolean enabled;
         private ProfileDisplayName displayName = new ProfileDisplayName();
         private ProfileThreepids threepid = new ProfileThreepids();
+        private ProfileRoles role = new ProfileRoles();
 
         public Boolean isEnabled() {
             return enabled;
@@ -220,6 +245,14 @@ public abstract class SqlConfig {
 
         public void setThreepid(ProfileThreepids threepid) {
             this.threepid = threepid;
+        }
+
+        public ProfileRoles getRole() {
+            return role;
+        }
+
+        public void setRole(ProfileRoles role) {
+            this.role = role;
         }
 
     }
@@ -314,17 +347,19 @@ public abstract class SqlConfig {
         log.info("Enabled: {}", isEnabled());
         if (isEnabled()) {
             log.info("Type: {}", getType());
-            log.info("Connection: {}", getConnection());
+            log.info("Has connection info? {}", !StringUtils.isEmpty(getConnection()));
+            log.debug("Connection: {}", getConnection());
             log.info("Auth enabled: {}", getAuth().isEnabled());
             log.info("Directory queries: {}", GsonUtil.build().toJson(getDirectory().getQuery()));
             log.info("Identity type: {}", getIdentity().getType());
             log.info("3PID mapping query: {}", getIdentity().getQuery());
             log.info("Identity medium queries: {}", GsonUtil.build().toJson(getIdentity().getMedium()));
             log.info("Profile:");
-            log.info("\tEnabled: {}", getProfile().isEnabled());
+            log.info("  Enabled: {}", getProfile().isEnabled());
             if (getProfile().isEnabled()) {
-                log.info("\tDisplay name query: {}", getProfile().getDisplayName().getQuery());
-                log.info("\tProfile 3PID query: {}", getProfile().getThreepid().getQuery());
+                log.info("  Display name query: {}", getProfile().getDisplayName().getQuery());
+                log.info("  Profile 3PID query: {}", getProfile().getThreepid().getQuery());
+                log.info("  Role query: {}", getProfile().getRole().getQuery());
             }
         }
     }
